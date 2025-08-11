@@ -11,7 +11,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @Configuration
 public class AppConfig {
 
-
+    @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)  throws Exception{
         httpSecurity.sessionManagement(managment->managment.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth->auth
