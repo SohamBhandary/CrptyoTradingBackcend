@@ -1,6 +1,6 @@
 package com.soham.TradingPlatform.Domain;
 
-public enum verificationType {
+public enum VerificationType {
     MOBILE,
     EMAIL
 }
