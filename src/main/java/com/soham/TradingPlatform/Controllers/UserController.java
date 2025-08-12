@@ -24,16 +24,11 @@ public class UserController {
     @GetMapping("/api/users/profile")
     public ResponseEntity<User> getUserProfile (@RequestHeader ("Authorization")String jwt) throws Exception {
         User user=userService.finduserProfileByJwt(jwt);
-        return new ResponseEntity<User>(user, HttpStatus.OK);
-    }
-    @PostMapping("/api/users/verification{verificationtype}/send-otp")
-    public ResponseEntity<User> sendVerifiacationOtp (@RequestHeader ("Authorization")String jwt,
-                                                      @PathVariable VerificationType verificationType)
-            throws Exception {
 
-        User user=userService.finduserProfileByJwt(jwt);
+
         return new ResponseEntity<User>(user, HttpStatus.OK);
     }
+
     @PatchMapping("/api/users/enable-twofactor/verify-otp/{otp}")
     public ResponseEntity<User> enableTwofactorAuth (@RequestHeader ("Authorization")String jwt) throws Exception {
         User user=userService.finduserProfileByJwt(jwt);
