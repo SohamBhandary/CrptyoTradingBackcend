@@ -8,6 +8,8 @@ import com.soham.TradingPlatform.utils.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class VerificationCodeServiceImple implements VerficationCodeService{
     @Autowired
@@ -27,18 +29,26 @@ public class VerificationCodeServiceImple implements VerficationCodeService{
     }
 
     @Override
-    public VerificationCode getVerificationCodeById(Long id) {
+    public VerificationCode getVerificationCodeById(Long id) throws Exception {
+        Optional<VerificationCode> verificationCode=verificationRepository.findById(id);
+        if(verificationCode.isPresent()){
+            return verificationCode.get();
+        }
+        throw  new Exception("Verification code not found");
+
+
 
 
     }
 
     @Override
     public VerificationCode getVerificationCodeByUser(Long userId) {
-        return null;
+        return verificationRepository.findByUserId(userId);
     }
 
     @Override
     public void deleteVerificationCodeById(VerificationCode verificationCode) {
+        verificationRepository.delete(verificationCode);
 
     }
 }
