@@ -2,16 +2,21 @@ package com.soham.TradingPlatform.Controllers;
 
 
 import com.soham.TradingPlatform.Domain.VerificationType;
+import com.soham.TradingPlatform.Entity.ForgotPasswordToken;
 import com.soham.TradingPlatform.Entity.User;
 import com.soham.TradingPlatform.Entity.VerificationCode;
 import com.soham.TradingPlatform.Service.EmailService;
+import com.soham.TradingPlatform.Service.ForgotPasswordService;
 import com.soham.TradingPlatform.Service.UserService;
 import com.soham.TradingPlatform.Service.VerficationCodeService;
+import com.soham.TradingPlatform.utils.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 public class UserController {
@@ -24,6 +29,8 @@ public class UserController {
     private String jwt;
     @Autowired
     private VerficationCodeService verficationCodeService;
+    @Autowired
+    private ForgotPasswordService forgotPasswordService;
 
     @GetMapping("/api/users/profile")
     public ResponseEntity<User> getUserProfile (@RequestHeader ("Authorization")String jwt) throws Exception {
@@ -69,6 +76,25 @@ public class UserController {
 
 
 
+    }
+    @PostMapping("/auth/users/reset-password/send-otp")
+    public ResponseEntity<String> sendForgotPasswordOtp(@RequestHeader("Authrization")String jwt
+            ,@PathVariable VerificationType verificationType) throws Exception{
+        User user= userService.finduserProfileByJwt(jwt);
+        String otp= OtpUtils.generateOtp();
+        UUID uuid=UUID.randomUUID();
+        String id =uuid.toString();
+        ForgotPasswordToken token= forgotPasswordService.findById(String.valueOf(user.getId()));
+        if(token==null){
+            token=forgotPasswordService.createToken(user,id,)
+        }
+
+
+
+
+
+
+        return new ResponseEntity<>("ForgotPassword otp sent succefully",HttpStatus.OK);
     }
 
 
