@@ -12,5 +12,6 @@ public interface CoinService {
     String searchCoin(String keyword);
 
     String getTop50CoinByMarketCapRank();
+    String getTradingCoins();
 
 }
