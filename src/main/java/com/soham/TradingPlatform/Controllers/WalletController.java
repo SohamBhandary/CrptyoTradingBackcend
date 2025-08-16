@@ -1,0 +1,55 @@
+package com.soham.TradingPlatform.Controllers;
+
+import com.soham.TradingPlatform.Entity.Order;
+import com.soham.TradingPlatform.Entity.User;
+import com.soham.TradingPlatform.Entity.Wallet;
+import com.soham.TradingPlatform.Entity.WalletTransaction;
+import com.soham.TradingPlatform.Service.UserService;
+import com.soham.TradingPlatform.Service.WalletService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/wallet")
+public class WalletController {
+    @Autowired
+    private WalletService walletService;
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("/api/wallet")
+    public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
+        User user=userService.finduserProfileByJwt(jwt);
+
+        Wallet wallet=walletService.getUserWallet(user);
+        return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+
+    }
+
+    @PutMapping("/api/wallet/${walletId}/transfer")
+    public ResponseEntity<Wallet> walletToWalletTransfer(@RequestHeader("Authorization") String jwt,
+                                                         @PathVariable Long walletId,
+                                                         @RequestBody WalletTransaction req) throws Exception {
+        User senderUser=userService.findUserById(Long.valueOf(jwt));
+        Wallet receieverWallet=walletService.findWalletById(walletId);
+        Wallet wallet=walletService.walletToWalletTransfer(senderUser,receieverWallet,req.getAmount());
+        return new ResponseEntity<>(wallet,HttpStatus.ACCEPTED);
+
+
+    }
+    @PutMapping("/api/wallet/order/{orderId}/pay")
+    public ResponseEntity<Wallet> payOrderPayment(@RequestHeader("Authorization") String jwt,
+                                                         @PathVariable Long orderId
+                                                         ) throws Exception {
+        User user=userService.findUserById(Long.valueOf(jwt));
+        Order order=orderService.getOrderId(orderId);
+        Wallet wallet=walletService.payOrderPayment(order,user);
+   return  new ResponseEntity<>(wallet,HttpStatus.ACCEPTED);
+
+
+    }
+
+
+}

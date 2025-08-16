@@ -1,5 +1,6 @@
 package com.soham.TradingPlatform.Service;
 
+import com.soham.TradingPlatform.Domain.OrderType;
 import com.soham.TradingPlatform.Entity.Order;
 import com.soham.TradingPlatform.Entity.User;
 import com.soham.TradingPlatform.Entity.Wallet;
@@ -68,9 +69,21 @@ public class WalletServiceImple implements WalletService{
     }
 
     @Override
-    public Wallet payOrderPayment(Order order, User user) {
+    public Wallet payOrderPayment(Order order, User user) throws Exception {
         Wallet wallet=getUserWallet(user);
-        if(order.getOderType)
-        return null;
+        if(order.getOderType().equals(OrderType.BUY)){
+            BigDecimal newBal=wallet.getBalance().subtract(order.getPrice());
+            if(newBal.compareTo(order.getPrice())<0){
+                throw new Exception("Insufficient fund");
+
+            }
+            wallet.setBalance(newBal);
+        }
+        else {
+            BigDecimal newBalance=wallet.getBalance().add(order.getPrice());
+            wallet.setBalance(newBalance);
+        }
+        walletRepository.save(wallet);
+        return wallet;
     }
 }
