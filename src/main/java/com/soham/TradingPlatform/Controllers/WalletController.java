@@ -4,6 +4,7 @@ import com.soham.TradingPlatform.Entity.Order;
 import com.soham.TradingPlatform.Entity.User;
 import com.soham.TradingPlatform.Entity.Wallet;
 import com.soham.TradingPlatform.Entity.WalletTransaction;
+import com.soham.TradingPlatform.Service.OrderService;
 import com.soham.TradingPlatform.Service.UserService;
 import com.soham.TradingPlatform.Service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class WalletController {
     private WalletService walletService;
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private OrderService orderService;
 
     @GetMapping("/api/wallet")
     public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
