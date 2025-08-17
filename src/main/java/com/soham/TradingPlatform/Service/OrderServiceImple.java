@@ -81,10 +81,51 @@ public class OrderServiceImple implements  OrderService{
         return savedOrder;
 
     }
+    @Transactional
+    public Order sellAssest(Coin coin,double quantity,User user) throws Exception {
+        if(quantity<=0){
+            throw  new Exception("quantityt should be greater than zero");
+        }
+        double sellPrice=coin.getCurrentPrice();
+        double buyPrice=assetToSell.getPrice();
+
+
+        OrderItem orderItem=createOrderItem(coin,quantity,buyPrice,0);
+        Order order= createOrder(user,orderItem,OrderType.SELL);
+        orderItem.setOrder(order);
+        if(assetToSell.getQuanity()>=quantity){
+            order.setStatus(OrderStatus.SUCCESS);
+            order.setOderType(OrderType.SELL);
+            Order savedOrder=orderRepository.save(order);
+            return savedOrder;
+
+            walletService.payOrderPayment(order,user);
+
+            Assest updatedAsset=assestService.updateAssest(assetToSell.getId()-quantity);
+            if(updatedAsset.getQuantity()*coin.getCurrentPrice()<=1){
+                assestService.deleteAssest(updatedAsset.getId);
+
+            }
+            return savedOrder;
+
+        }
+        throw new Exception("Insufficient Quanityt");
+
+
+
+    }
 
 
     @Override
-    public Order processOrder(Coin coin, double quantity, OrderType orderType, User user) {
-        return null;
+    @Transactional
+    public Order processOrder(Coin coin, double quantity, OrderType orderType, User user) throws Exception {
+        if(orderType==OrderType.BUY){
+            return buyAssest(coin,quantity,user);
+        } else if (orderType.equals(OrderType.SELL)) {
+            return sellAssest(coin,quantity,user);
+
+            
+        }
+        throw  new Exception("Invalid Order type");
     }
 }
