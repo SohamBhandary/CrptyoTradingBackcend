@@ -2,10 +2,7 @@ package com.soham.TradingPlatform.Service;
 
 import com.soham.TradingPlatform.Domain.OrderStatus;
 import com.soham.TradingPlatform.Domain.OrderType;
-import com.soham.TradingPlatform.Entity.Coin;
-import com.soham.TradingPlatform.Entity.Order;
-import com.soham.TradingPlatform.Entity.OrderItem;
-import com.soham.TradingPlatform.Entity.User;
+import com.soham.TradingPlatform.Entity.*;
 import com.soham.TradingPlatform.Repository.OrderItemRepository;
 import com.soham.TradingPlatform.Repository.OrderRepository;
 import jakarta.transaction.Transactional;
@@ -25,6 +22,9 @@ public class OrderServiceImple implements  OrderService{
 
     @Autowired
     private OrderItemRepository orderItemRepository;
+
+    @Autowired
+    private AssestService assestService;
 
 
     @Override
@@ -78,42 +78,59 @@ public class OrderServiceImple implements  OrderService{
         order.setStatus(OrderStatus.SUCCESS);
         order.setOderType(OrderType.BUY);
         Order savedOrder=orderRepository.save(order);
+        Assest oldAssest=assestService.findAssetByUserIdAndCoinid(order.getUser().getId(),order.getOrderItem().getCoin().getId());
+        if(oldAssest==null){
+            assestService.createAssest(user,orderItem.getCoin(),orderItem.getQuantity());
+        }
+        else{
+            assestService.updateAssest(oldAssest.getId(),quantity);
+
+        }
         return savedOrder;
 
     }
     @Transactional
-    public Order sellAssest(Coin coin,double quantity,User user) throws Exception {
-        if(quantity<=0){
-            throw  new Exception("quantityt should be greater than zero");
-        }
-        double sellPrice=coin.getCurrentPrice();
-        double buyPrice=assetToSell.getPrice();
+    public Order sellAsset(Coin coin,double quantity, User user) throws Exception {
+        double sellPrice =coin.getCurrentPrice();
 
+        Assest assetToSell = assestService.findAssetByUserIdAndCoinid(
+                user.getId(),
+                coin.getId()
+        );
 
-        OrderItem orderItem=createOrderItem(coin,quantity,buyPrice,0);
-        Order order= createOrder(user,orderItem,OrderType.SELL);
-        orderItem.setOrder(order);
-        if(assetToSell.getQuanity()>=quantity){
-            order.setStatus(OrderStatus.SUCCESS);
-            order.setOderType(OrderType.SELL);
-            Order savedOrder=orderRepository.save(order);
-            return savedOrder;
+        if (assetToSell != null) {
 
-            walletService.payOrderPayment(order,user);
+            OrderItem orderItem = createOrderItem(coin,quantity, assetToSell.getBuyprice(), sellPrice);
 
-            Assest updatedAsset=assestService.updateAssest(assetToSell.getId()-quantity);
-            if(updatedAsset.getQuantity()*coin.getCurrentPrice()<=1){
-                assestService.deleteAssest(updatedAsset.getId);
+            Order order = createOrder(user, orderItem, OrderType.SELL);
 
+            orderItem.setOrder(order);
+
+            Order savedOrder = orderRepository.save(order);
+
+            if (assetToSell.getQuantity() >= quantity) {
+
+                walletService.payOrderPayment(order, user);
+
+                Assest updatedAsset=assestService.updateAssest(
+                        assetToSell.getId(),
+                        -quantity
+                );
+                if(updatedAsset.getQuantity()*coin.getCurrentPrice()<=1){
+                    assestService.deleteAssest(updatedAsset.getId());
+                }
+                return savedOrder;
+            } else {
+
+                orderRepository.delete(order);
+                throw new Exception("Insufficient quantity to sell");
             }
-            return savedOrder;
-
         }
-        throw new Exception("Insufficient Quanityt");
 
-
+        throw new Exception("Asset not found for selling");
 
     }
+
 
 
     @Override

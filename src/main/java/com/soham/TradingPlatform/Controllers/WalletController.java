@@ -48,7 +48,7 @@ public class WalletController {
                                                          @PathVariable Long orderId
                                                          ) throws Exception {
         User user=userService.findUserById(Long.valueOf(jwt));
-        Order order=orderService.getOrderId(orderId);
+        Order order=orderService.getOrderById(orderId);
         Wallet wallet=walletService.payOrderPayment(order,user);
    return  new ResponseEntity<>(wallet,HttpStatus.ACCEPTED);
 
