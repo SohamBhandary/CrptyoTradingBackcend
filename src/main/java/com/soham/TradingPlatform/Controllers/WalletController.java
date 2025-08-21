@@ -1,10 +1,9 @@
 package com.soham.TradingPlatform.Controllers;
 
-import com.soham.TradingPlatform.Entity.Order;
-import com.soham.TradingPlatform.Entity.User;
-import com.soham.TradingPlatform.Entity.Wallet;
-import com.soham.TradingPlatform.Entity.WalletTransaction;
+import com.soham.TradingPlatform.Entity.*;
+import com.soham.TradingPlatform.Response.PaymentResponse;
 import com.soham.TradingPlatform.Service.OrderService;
+import com.soham.TradingPlatform.Service.PaymentService;
 import com.soham.TradingPlatform.Service.UserService;
 import com.soham.TradingPlatform.Service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,9 @@ public class WalletController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private PaymentService paymentService;
 
     @GetMapping("/api/wallet")
     public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
@@ -54,6 +56,31 @@ public class WalletController {
 
 
     }
+
+    @PutMapping("/api/wallet/deposit/")
+    public ResponseEntity<Wallet> addBalanceToWallet(@RequestHeader("Authorization") String jwt,
+                                                   @RequestParam(name="order_id") Long orderId,
+                                                  @RequestParam(name="payment_id") String paymentId
+
+
+
+    ) throws Exception {
+        User user=userService.findUserById(Long.valueOf(jwt));
+
+        Wallet wallet=walletService.getUserWallet(user);
+        PaymentOrder order=paymentService.getPaymentOrderById(orderId);
+        Boolean status=paymentService.proccedPaymentOrder(order,paymentId);
+        PaymentResponse res= new PaymentResponse();
+        res.setPayment_url("deposit success");
+        if(status){
+            wallet=walletService.addBalance(wallet,order.getAmount());
+        }
+        return  new ResponseEntity<>(wallet,HttpStatus.ACCEPTED);
+
+
+    }
+
+
 
 
 }
