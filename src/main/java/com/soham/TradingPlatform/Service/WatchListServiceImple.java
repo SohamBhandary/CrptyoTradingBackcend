@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 @Service
-public class WatchListImple implements WatchListService {
+public class WatchListServiceImple implements WatchListService {
 
     @Autowired
     private WatchListRepository watchListRepository;

@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/watchlist")
 
 public class WatchListController {
+    @Autowired
     private  WatchListService watchlistService;
+    @Autowired
     private UserService userService;
 
     @Autowired
