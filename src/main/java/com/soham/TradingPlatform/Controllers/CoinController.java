@@ -20,7 +20,7 @@ public class CoinController {
     @Autowired
     private ObjectMapper objectMapper;
     @GetMapping
-    ResponseEntity<List<Coin>>getCoinList(@RequestParam("page") int page)
+    ResponseEntity<List<Coin>>getCoinList(@RequestParam( required = false, name="page") int page)
     {
         List<Coin> coinList=coinService.getCoinList(page);
 
@@ -54,7 +54,7 @@ public class CoinController {
         return ResponseEntity.ok(jsonNode);
 
     }
-    @GetMapping("/trading")
+    @GetMapping("/trending")
     ResponseEntity<JsonNode> getTreadingCoin() throws JsonProcessingException {
         String coin=coinService.getTradingCoins();
         JsonNode jsonNode = objectMapper.readTree(coin);

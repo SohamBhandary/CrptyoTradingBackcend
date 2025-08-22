@@ -33,7 +33,7 @@ public class ForgotPasswordServiceImple implements  ForgotPasswordService{
 
     @Override
     public ForgotPasswordToken findByUser(Long userId) {
-        return forgotPasswordRepository.findByUserId(String.valueOf(userId));
+        return forgotPasswordRepository.findByUserId(Long.valueOf(String.valueOf(userId)));
     }
 
     @Override

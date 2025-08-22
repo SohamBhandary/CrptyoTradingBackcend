@@ -10,17 +10,22 @@ import com.soham.TradingPlatform.Entity.PaymentOrder;
 import com.soham.TradingPlatform.Entity.User;
 import com.soham.TradingPlatform.Repository.PaymentOrderRepository;
 import com.soham.TradingPlatform.Response.PaymentResponse;
+import com.stripe.Stripe;
+import com.stripe.param.billingportal.SessionCreateParams;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+@Service
 public class PaymentServiceImple implements PaymentService{
 
     @Autowired
     private PaymentOrderRepository paymentOrderRepository;
 
-    @Value("${stripe.api.key}")
-    private String stripeSecretKey;
+
 
     @Value(("${razorpay.api.key}"))
     private String apiKey;
@@ -40,7 +45,11 @@ public class PaymentServiceImple implements PaymentService{
 
     @Override
     public PaymentOrder getPaymentOrderById(Long id) throws Exception {
-        return paymentOrderRepository.findById(id).orElseThrow(()->new Exception("payment order not found")).getMethod();
+        Optional<PaymentOrder> optionalPaymentOrder=paymentOrderRepository.findById(id);
+        if(optionalPaymentOrder.isEmpty()){
+            throw new Exception("payment order not found with id "+id);
+        }
+        return optionalPaymentOrder.get();
     }
 
     @Override
@@ -70,18 +79,10 @@ public class PaymentServiceImple implements PaymentService{
 
 
 
-    @Override
-    public PaymentResponse createStripePayPAymentLink(User user, Long amount, Long orderId) {
-        return null;
-    }
+
 
     @Override
-    public PaymentResponse createRazorpayPaymentLink(User user, Long amount, Long id) {
-        return null;
-    }
-
-    @Override
-    public PaymentResponse createRayzorPayPAymentLink(User user, Long amount) throws RazorpayException {
+    public PaymentResponse createRazorpayPaymentLink(User user, Long amount, Long id) throws RazorpayException {
         Long amount1=amount*100;
         try {
 
@@ -123,6 +124,7 @@ public class PaymentServiceImple implements PaymentService{
             System.out.println("Error creating payment link: " + e.getMessage());
             throw new RazorpayException(e.getMessage());
         }
-
     }
+
+
 }

@@ -1,4 +1,4 @@
-package com.soham.TradingPlatform.Repository;
+package com.soham.TradingPlatform.Service;
 
 import com.soham.TradingPlatform.Entity.Coin;
 import com.soham.TradingPlatform.Entity.User;

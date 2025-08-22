@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface AssetRepository extends JpaRepository<Assest,Long> {
     List<Assest> findByUserId(Long userId);
-    Assest findByUserIdandCoinId(Long userId,String coinId);
+    Assest findByUserIdAndCoinId(Long userId,String coinId);
 }

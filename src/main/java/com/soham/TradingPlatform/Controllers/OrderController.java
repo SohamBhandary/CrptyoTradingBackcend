@@ -8,6 +8,7 @@ import com.soham.TradingPlatform.Request.CreateOrderRequest;
 import com.soham.TradingPlatform.Service.CoinService;
 import com.soham.TradingPlatform.Service.OrderService;
 import com.soham.TradingPlatform.Service.UserService;
+import com.soham.TradingPlatform.Service.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class OrderController {
     private CoinService coinService;
 
     @Autowired
-    private WalletTransactionService walletTransactionService;
+    private WalletService walletTransactionService;
 
     @Autowired
     public OrderController(OrderService orderService, UserService userSerivce) {

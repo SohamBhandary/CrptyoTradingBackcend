@@ -9,7 +9,7 @@ public interface WithdrawlService {
 
     Withdrawl requestWithDrawl(Long amount, User user);
 
-    Withdrawl proceedWithDrawl(Long withdrwalId,boolean accept);
+    Withdrawl proceedWithDrawl(Long withdrwalId,boolean accept)  throws Exception ;
 
     List<Withdrawl> getUSerWithdrawlHisotry(User user);
 

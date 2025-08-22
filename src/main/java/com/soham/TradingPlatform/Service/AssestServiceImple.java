@@ -5,8 +5,12 @@ import com.soham.TradingPlatform.Entity.Coin;
 import com.soham.TradingPlatform.Entity.User;
 import com.soham.TradingPlatform.Repository.AssetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+
+@Service
 
 public class AssestServiceImple implements  AssestService{
     @Autowired
@@ -51,7 +55,7 @@ public class AssestServiceImple implements  AssestService{
 
     @Override
     public Assest findAssetByUserIdAndCoinid(Long userId, String coinId) {
-        return assetRepository.findByUserIdandCoinId(userId,coinId);
+        return assetRepository.findByUserIdAndCoinId(userId,coinId);
     }
 
     @Override

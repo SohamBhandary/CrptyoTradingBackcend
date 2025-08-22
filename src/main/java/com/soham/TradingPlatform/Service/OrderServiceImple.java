@@ -139,7 +139,7 @@ public class OrderServiceImple implements  OrderService{
         if(orderType==OrderType.BUY){
             return buyAssest(coin,quantity,user);
         } else if (orderType.equals(OrderType.SELL)) {
-            return sellAssest(coin,quantity,user);
+            return sellAsset(coin,quantity,user);
 
             
         }

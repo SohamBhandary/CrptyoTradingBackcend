@@ -8,6 +8,7 @@ import com.soham.TradingPlatform.Response.AuthResponse;
 import com.soham.TradingPlatform.Service.CustomUserDeatilsService;
 import com.soham.TradingPlatform.Service.EmailService;
 import com.soham.TradingPlatform.Service.TwoFactorOtpService;
+import com.soham.TradingPlatform.Service.WatchListService;
 import com.soham.TradingPlatform.utils.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,42 +33,36 @@ public class AuthController {
     private TwoFactorOtpService twoFactorOtpService;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private WatchListService watchListService;
+
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> register(@RequestBody User user) throws Exception {
-
-        User isEmailExsist= userRepository.findByEmail(user.getEmail());
-        if(isEmailExsist!=null){
-            throw new Exception("Email is already used with other account");
+        User isEmailExist = userRepository.findByEmail(user.getEmail());
+        if (isEmailExist != null) {
+            throw new Exception("Email is already used with another account");
         }
-        User newUser= new User();
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        User newUser = new User();
         newUser.setEmail(user.getEmail());
-        newUser.setPassword(user.getPassword());
-        newUser.setEmail(user.getEmail());
+        newUser.setPassword(encodedPassword);
         newUser.setFullName(user.getFullName());
-
-        User savedUser= userRepository.save(newUser);
-        Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(),user.getPassword());
-
+        User savedUser = userRepository.save(newUser);
+        watchListService.createWatchLis(savedUser);
+        Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
         SecurityContextHolder.getContext().setAuthentication(auth);
-
-
-        String jwt= JwtProvider.generateToken(auth);
-
-
-        AuthResponse res= new AuthResponse();
+        String jwt = JwtProvider.generateToken(auth);
+        AuthResponse res = new AuthResponse();
         res.setJwt(jwt);
         res.setStatus(true);
-        res.setMessage("Registered succesfully");
-
+        res.setMessage("Registered successfully");
         return new ResponseEntity<>(res, HttpStatus.CREATED);
-
-
-
-
     }
 
     @PostMapping("/signin")
     public ResponseEntity<AuthResponse> login(@RequestBody User user) throws Exception {
+
 
         String userName=user.getEmail();
         String passsword=user.getPassword();
@@ -110,10 +107,11 @@ public class AuthController {
 
     private Authentication authenticate(String userName, String passsword) {
         UserDetails userDetails=customUserDeatilsService.loadUserByUsername(userName);
+        BCryptPasswordEncoder passwordEncoder= new BCryptPasswordEncoder();
         if(userDetails==null){
             throw  new BadCredentialsException("Invalid username");
         }
-        if(!passsword.equals(userDetails.getPassword())){
+        if(!passwordEncoder.matches(passsword,userDetails.getPassword())){
             throw new BadCredentialsException("invalid password");
 
         }

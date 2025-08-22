@@ -4,7 +4,6 @@ import com.soham.TradingPlatform.Entity.Coin;
 import com.soham.TradingPlatform.Entity.User;
 import com.soham.TradingPlatform.Entity.Watchlist;
 import com.soham.TradingPlatform.Repository.WatchListRepository;
-import com.soham.TradingPlatform.Repository.WatchListService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -35,17 +35,22 @@ public class PaymentController {
 
         User user = userService.finduserProfileByJwt(jwt);
 
-        PaymentResponse paymentResponse;
+        PaymentResponse paymentResponse = null;
 
         PaymentOrder order = paymentService.createOrder(user, amount, paymentMethod);
 
         if (paymentMethod.equals(PaymentMethod.RAZORPAY)) {
+
             paymentResponse = paymentService.createRazorpayPaymentLink(user, amount,
                     order.getId());
-        } else {
-            paymentResponse = paymentService.createStripePayPAymentLink(user, amount, order.getId());
-        }
 
+        }
         return new ResponseEntity<>(paymentResponse, HttpStatus.CREATED);
+
+//        else {
+//            paymentResponse = paymentService.createStripePayPAymentLink(user, amount, order.getId());
+//        }
+
+
     }
 }

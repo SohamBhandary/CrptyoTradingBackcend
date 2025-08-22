@@ -34,7 +34,7 @@ public class WalletController {
 
     }
 
-    @PutMapping("/api/wallet/${walletId}/transfer")
+    @PutMapping("/api/wallet/{walletId}/transfer")
     public ResponseEntity<Wallet> walletToWalletTransfer(@RequestHeader("Authorization") String jwt,
                                                          @PathVariable Long walletId,
                                                          @RequestBody WalletTransaction req) throws Exception {
